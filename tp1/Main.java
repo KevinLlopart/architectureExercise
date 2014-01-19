@@ -39,11 +39,11 @@ public class Main {
 		System.out.println("**** Test de " + fabN.getClass() + "  ****");
 		
 		test(fabN);
-		/*FabriqueZ fabZ = mutable ? FabriquerZ.MUTABLE : FabriquerZ.IMMUTABLE;
+		FabriqueZ fabZ = mutable ? FabriquerZ.MUTABLE : FabriquerZ.IMMUTABLE;
 		System.out.println("**** Test de " + fabZ.getClass() + "  ****");
 		test(fabN, fabZ);
 
-		FabriqueReel fabR = mutable ? FabriquerReel.MUTABLE : FabriquerReel.IMMUTABLE;
+		/*FabriqueReel fabR = mutable ? FabriquerReel.MUTABLE : FabriquerReel.IMMUTABLE;
 
 		FabriqueRationnel fabRat = fraction ? FabriqueFraction.SINGLETON : FabriqueQuotient.SINGLETON;
 		if(!mutable){
@@ -112,58 +112,60 @@ public class Main {
 	private static void test(FabriqueNat fabN, FabriqueZ fabrique){
 		Z x = null;
 		Z zero = fabrique.creer(0);
-		System.out.println("0 | 0 - 0 ? " + zero);
+		System.out.println("0 | 0 - 0 ? " + zero.val());
 		x = fabrique.creer(2);
 		System.out.println("0 = 0 ? " + zero.equals(x.zero()));
 		zero = fabrique.creer(true, fabN.creer());
-		System.out.println("0 | 0 - 0 ? " + zero);
+		System.out.println("0 | 0 - 0 ? " + zero.val());
 		System.out.println("0 = 0 ? " + zero.equals(x.zero()));
 		zero = fabrique.creer(fabN.creer(), fabN.creer());
-		System.out.println("0 | 0 - 0 ? " + zero);
+		System.out.println("0 | 0 - 0 ? " + zero.val());
 		System.out.println("0 = 0 ? " + zero.equals(x.zero()));
 
 		Z un = fabrique.creer(1);
-		System.out.println("1 | 1 - 0 ? " + un);
+		System.out.println("1 | 1 - 0 ? " + un.val());
 		System.out.println("1 = 1 ? " + un.equals(x.un()));
 		un = fabrique.creer(true, fabN.creer(1));
-		System.out.println("1 | 1 - 0 ? " + un);
+		System.out.println("1 | 1 - 0 ? " + un.val());
 		System.out.println("1 = 1 ? " + un.equals(x.un()));
 		un = fabrique.creer(fabN.creer(1), fabN.creer());
-		System.out.println("1 | 1 - 0 ? " + un);
+		System.out.println("1 | 1 - 0 ? " + un.val());
 		System.out.println("1 = 1 ? " + un.equals(x.un()));
 
 		Z moinsUn = fabrique.creer(- 1);
-		System.out.println("-1 | 0 - 1 ? " + moinsUn);
+		System.out.println("-1 | 0 - 1 ? " + moinsUn.val());
 		System.out.println("-1 = -1 ? " + moinsUn.equals(x.un().oppose()));
 		moinsUn = fabrique.creer(false, fabN.creer(1));
-		System.out.println("-1 | 0 - 1 ? " + moinsUn);
+		System.out.println("-1 | 0 - 1 ? " + moinsUn.val());
 		System.out.println("-1 = -1 ? " + moinsUn.equals(x.un().oppose()));
-		System.out.println("-1 | 0 - 1 ? " + moinsUn);
+		System.out.println("-1 | 0 - 1 ? " + moinsUn.val());
 		System.out.println("-1 = -1 ? " + moinsUn.equals(x.un().oppose()));
-
+		
 		Z moinsCinq = fabrique.creer(- 5);
-		System.out.println("-5 | 0 - 5 ? " + moinsCinq);
+		System.out.println("-5 | 0 - 5 ? " + moinsCinq.val());
 		Z six = fabrique.creer(6);
-		System.out.println("6 | 6 - 0 ? " + six);
+		System.out.println("6 | 6 - 0 ? " + six.val());
 		x = x.zero();
 		x = x.somme(moinsCinq).somme(six);
-		System.out.println("1 | 6 - 5 ? " + x);
-		System.out.println("1 | 61 - 60 ? " + x.produit(x));
+		System.out.println("1 | 6 - 5 ? " + x.val());
+		System.out.println("1 | 61 - 60 ? " + x.produit(x).val());
 		x = x.un();
 		x = x.produit(moinsCinq).produit(six);
-		System.out.println("-30 | 0 - 30 ? " + x);
+		System.out.println("-30 | 0 - 30 ? " + x.val());
 		System.out.println("-30 <= 0 ? " + x.estNegatif());
 		System.out.println("-30 >= 0 ? " + x.estPositif());
-		System.out.println("0 - 30 ? " + x.diminuende() + " - " + x.diminuteur());
+		System.out.println("0 - 30 ? " + x.diminuende().val() + " - " + x.diminuteur().val());
 		x = x.zero();
 		for(int i = 0; i < 100000000; i++){
 			x = x.somme(moinsUn);
 		}
-		System.out.println((-1 * 100000000) + " ? " + x);
+		System.out.println((-1 * 100000000) + " ? " + x.val());
 		if(mutable){
-			System.out.println(FabriquerZ.immutable(x));
+			System.out.println("Cast to immutable");
+			System.out.println(FabriquerZ.immutable(x).val());
 		}else{
-			System.out.println(FabriquerZ.mutable(x));
+			System.out.println("Cast to mutable");
+			System.out.println(FabriquerZ.mutable(x).val());
 		}
 	}
 

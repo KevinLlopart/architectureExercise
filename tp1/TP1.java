@@ -165,8 +165,7 @@ class NatMutableParIntPositif extends IntPositif implements Nat,Mutable{
 	}
 
 	public Nat zero() {
-		this.i=0;
-		return this;
+		return new NatMutableParIntPositif(0);
 	}
 
 	public Nat produit(Nat x) {
@@ -175,8 +174,7 @@ class NatMutableParIntPositif extends IntPositif implements Nat,Mutable{
 	}
 
 	public Nat un() {
-		this.i+=1;
-		return this;
+		return new NatMutableParIntPositif(1);
 	}
 
 	public Nat predecesseur(){
@@ -189,7 +187,7 @@ class NatMutableParIntPositif extends IntPositif implements Nat,Mutable{
 	}
 	
 }
-// TODO (compléter) classe FabriquerNat
+//classe FabriquerNat
 //DONE!
 class FabriquerNat {
 	public static final FabriqueNat MUTABLE = new NatMutableParIntPositif(0);
@@ -210,7 +208,6 @@ class FabriquerNat {
 	}
 }
 
-/*
 interface Relatif {
 	int val(); // Convertit en un int
 	boolean estPositif(); // Teste si l'entier relatif est positif
@@ -248,50 +245,217 @@ interface Z extends Relatif, FabriqueZ, AnneauZ {
 
 interface Efficace {}
 
-// TODO top down - haut - immutable - classe ZEfficace
-class ZEfficace{
-	
+//top down - haut - immutable - classe ZEfficace
+//DONE!
+abstract class ZEfficace implements Z, Efficace{
+
+    @Override
+    public final Z somme(Z a) {
+        return this.creer(a.val() + this.val());
+    }
+
+    @Override
+    public final Z zero() {
+        return this.creer(0);
+    }
+
+    @Override
+    public final Z oppose() {
+        return this.creer(-this.val());
+    }
+
+    @Override
+    public final Z produit(Z a) {
+        return this.creer(this.val()*a.val());
+    }
+
+    @Override
+    public final Z un() {
+        return this.creer(1);
+    }
 }
 
-// TODO top down - bas - immutable - classe ZEfficaceParInt
-class ZEfficaceParInt extends ZEfficace {
-	// Dépendance relative à une fabrique d'entiers naturels
-	private static FabriqueNat fabNat = FabriquerNat.IMMUTABLE;
+//top down - bas - immutable - classe ZEfficaceParInt
+//DONE!
+final class ZEfficaceParInt extends ZEfficace implements Z{
 
-	public static void setFabriqueNat(FabriqueNat fabNat){
-		if(fabNat instanceof Mutable){
-			throw new IllegalArgumentException(fabNat + Messages.FABNAT_MUTABLE);
-		}
-		ZEfficaceParInt.fabNat = fabNat;
-	}
+    protected int val;
 
+    public ZEfficaceParInt(int val) {
+        this.val = val;
+    }
 
+    // Dépendance relative à une fabrique d'entiers naturels
+    private static FabriqueNat fabNat = FabriquerNat.IMMUTABLE;
+
+    public static void setFabriqueNat(FabriqueNat fabNat){
+        if(fabNat instanceof Mutable){
+            throw new IllegalArgumentException(fabNat + Messages.FABNAT_MUTABLE);
+        }
+        ZEfficaceParInt.fabNat = fabNat;
+    }
+
+    @Override
+    public Z creer(boolean signe, Nat abs) {
+        return signe ? new ZEfficaceParInt(abs.val()) : new ZEfficaceParInt((-abs.val()));
+    }
+
+    @Override
+    public Z creer(Nat diminuende, Nat diminuteur) {
+        return new ZEfficaceParInt(diminuende.val() - diminuteur.val());
+    }
+
+    @Override
+    public Z creer(int val) {
+        return new ZEfficaceParInt(val);
+    }
+
+    @Override
+    public int val() {
+        return val;
+    }
+
+    @Override
+    public boolean estPositif() {
+        return val >= 0;
+    }
+
+    @Override
+    public boolean estNegatif() {
+        return val <= 0;
+    }
+
+    @Override
+    public Nat valAbsolue() {
+        return val >= 0 ? fabNat.creer(val) : fabNat.creer(-val);
+    }
+
+    @Override
+    public Nat diminuende() {
+        return val>=0 ? fabNat.creer(val) : fabNat.creer(0);
+    }
+
+    @Override
+    public Nat diminuteur() {
+    	return val>=0 ? fabNat.creer(0) : fabNat.creer(-val);
+    }
 }
 
-// TODO top down - haut - mutable - classe ZEfficaceMutable
+// top down - haut - mutable - classe ZEfficaceMutable
+//DONE!
+abstract class ZEfficaceMutable implements Z, Efficace,Mutable{
 
-// TODO top down - bas - mutable - class ZEfficaceMutableParInt
+  @Override
+  public Z zero() {
+      return this.creer(0);
+  }
 
-// TODO (compléter) classe FabriquerZ
+  @Override
+  public Z oppose() {
+      return this.creer(-this.val());
+  }
+  protected int val;
+  @Override
+  public Z un() {
+      return this.creer(1);
+  }
+}
+// top down - bas - mutable - class ZEfficaceMutableParInt
+//DONE!
+class ZEfficaceMutableParInt extends ZEfficaceMutable implements Z{
+
+    protected int val;
+    // Dépendance relative à une fabrique d'entiers naturels
+    private static FabriqueNat fabNat = FabriquerNat.MUTABLE;
+
+    public ZEfficaceMutableParInt(int val) {
+        this.val = val;
+    }
+    @Override
+    public Z somme(Z a) {
+  	  this.val+=a.val();
+        return this;
+    }
+    @Override
+    public Z produit(Z a) {
+  	  this.val*=a.val();
+        return this;
+    }
+
+    public static void setFabriqueNat(FabriqueNat fabNat){
+        if(! (fabNat instanceof Mutable)){
+            throw new IllegalArgumentException(fabNat + Messages.FABNAT_IMMUTABLE);
+        }
+        ZEfficaceMutableParInt.fabNat = fabNat;
+    }
+
+    @Override
+    public Z creer(boolean signe, Nat abs) {
+        return signe ? new ZEfficaceMutableParInt(abs.val()) : new ZEfficaceMutableParInt((-abs.val()));
+    }
+
+    @Override
+    public Z creer(Nat diminuende, Nat diminuteur) {
+        return new ZEfficaceMutableParInt(diminuende.val() - diminuteur.val());
+    }
+
+    @Override
+    public Z creer(int val) {
+        return new ZEfficaceMutableParInt(val);
+    }
+
+    @Override
+    public int val() {
+        return val;
+    }
+
+    @Override
+    public boolean estPositif() {
+        return val >= 0;
+    }
+
+    @Override
+    public boolean estNegatif() {
+        return val <= 0;
+    }
+
+    @Override
+    public Nat valAbsolue() {
+        return val >= 0 ? fabNat.creer(val) : fabNat.creer(-val);
+    }
+
+    @Override
+    public Nat diminuende() {
+        return val>=0 ? fabNat.creer(val) : fabNat.creer(0);
+    }
+
+    @Override
+    public Nat diminuteur() {
+    	return val>=0 ? fabNat.creer(0) : fabNat.creer(-val);
+    }
+}
+
+// classe FabriquerZ
+//DONE!
 class FabriquerZ {
-	public static final FabriqueZ IMMUTABLE = null; 
-	public static final FabriqueZ MUTABLE = null;
+	public static final FabriqueZ IMMUTABLE = new ZEfficaceParInt(0); 
+	public static final FabriqueZ MUTABLE = new ZEfficaceMutableParInt(0);
 	public static Z mutable(Z n){
 		if(!(n instanceof Mutable)){
-
+			return MUTABLE.creer(n.val());
 		}else{
 			throw new IllegalArgumentException(n + Messages.Z_MUTABLE);
 		}
 	}
 	public static Z immutable(Z n){
 		if(n instanceof Mutable){
-
+			return IMMUTABLE.creer(n.val());
 		}else{
 			throw new IllegalArgumentException(n + Messages.Z_NON_MUTABLE);
 		}
 	}
 }
-
+/*
 interface FabriqueReel {
 	Reel creer(double r);
 }
