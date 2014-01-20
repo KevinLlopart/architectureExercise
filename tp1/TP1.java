@@ -457,39 +457,189 @@ class FabriquerZ {
 		}
 	}
 }
-/*
+
+
+
+//REELS
+
 interface FabriqueReel {
 	Reel creer(double r);
 }
 
 interface CorpsReel {
 	Reel somme(Reel a);
+
 	Reel zero();
+
 	Reel oppose();
+
 	Reel produit(Reel a);
+
 	Reel un();
+
 	Reel inverse();
 }
 
 interface Reel extends FabriqueReel, CorpsReel {
 	double val();
 }
-// TODO - Agrégation simple - immutable - classe ReelParDouble
+
+//Agrégation simple - immutable - classe ReelParDouble
 class ReelParDouble implements Reel {
-	private static double PRECISION = 1e-12; // Précision relative lors des tests d'égalité.
+	private static double PRECISION = 1e-12; // Précision relative lors des
+												// tests d'égalité. }
+	private double leDouble;
+
+	public ReelParDouble(double leDouble) {
+		this.leDouble = leDouble;
+	}
+
+	@Override
+	public Reel creer(double r) {
+		return new ReelParDouble(r);
+	}
+
+	@Override
+	public Reel somme(Reel a) {
+		return this.creer(this.val() + a.val());
+	}
+
+	@Override
+	public Reel zero() {
+		return this.creer(0);
+	}
+
+	@Override
+	public Reel oppose() {
+		return this.creer(-this.val());
+	}
+
+	@Override
+	public Reel produit(Reel a) {
+		return this.creer(a.val() * this.val());
+	}
+
+	@Override
+	public Reel un() {
+		return this.creer(1);
+	}
+
+	@Override
+	public Reel inverse() {
+		return this.creer(1 / val());
+	}
+
+	@Override
+	public double val() {
+		return this.leDouble;
+	}
+
+	@Override
+	public String toString() {
+		return "" + this.val();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Reel))
+			return false;
+		return (((Reel) o).val() - this.val() <= PRECISION);
+	}
+
 }
 
-// TODO - Agrégation simple - mutable - classe ReelMutableParDouble
+//- Agrégation simple - mutable - classe ReelMutableParDouble
+class ReelParDoubleMutable implements Reel, Mutable {
 
+	private static double PRECISION = 1e-12; // Précision relative lors des
+	// tests d'égalité. }
+	private double leDouble;
 
-// TODO (compléter) - classe FabriquerReel
+	public ReelParDoubleMutable(double leDouble) {
+		this.leDouble = leDouble;
+	}
+
+	@Override
+	public Reel creer(double r) {
+		return new ReelParDoubleMutable(r);
+	}
+
+	@Override
+	public Reel somme(Reel a) {
+		this.leDouble = a.val() + this.val();
+		return this;
+	}
+
+	@Override
+	public Reel zero() {
+		this.leDouble = 0;
+		return this;
+	}
+
+	@Override
+	public Reel oppose() {
+		this.leDouble = -this.val();
+		return this;
+	}
+
+	@Override
+	public Reel produit(Reel a) {
+		this.leDouble *= a.val();
+		return this;
+	}
+
+	@Override
+	public Reel un() {
+		this.leDouble = 1;
+		return this;
+	}
+
+	@Override
+	public Reel inverse() {
+		this.leDouble = 1 / leDouble;
+		return this;
+	}
+
+	@Override
+	public double val() {
+		return leDouble;
+	}
+
+	@Override
+	public String toString() {
+		return "" + this.val();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Reel))
+			return false;
+		return (((Reel) o).val() - this.val() <= PRECISION);
+	}
+
+}
+
 class FabriquerReel {
+	public static final FabriqueReel IMMUTABLE = new ReelParDouble(0);
+	public static final FabriqueReel MUTABLE = new ReelParDoubleMutable(0);
 
+	public static Reel mutable(Reel r) {
+		if (!(r instanceof Mutable)) {
+			return MUTABLE.creer(r.val());
+		} else {
+			throw new IllegalArgumentException(r + Messages.REEL_MUTABLE);
+		}
+	}
+
+	public static Reel immutable(Reel r) {
+		if (r instanceof Mutable) {
+			return IMMUTABLE.creer(r.val());
+		} else {
+			throw new IllegalArgumentException(r + Messages.REEL_NON_MUTABLE);
+		}
+	}
 }
 
-
-
-*/
 
 //RATIONNEL
 
@@ -1058,7 +1208,7 @@ class QMutableSymbolique extends QAbstrait implements Q, Mutable{
 
 // TODO (compléter) - Fabriques de rationnels
 class FabriquerQ {
-	public static final FabriqueQ SYMBOLIQUE = null
+	public static final FabriqueQ SYMBOLIQUE = null;
 			public static final FabriqueQ EFFICACE = null;
 	public static final FabriqueQ MUTABLE_SYMBOLIQUE = null;
 	public static final FabriqueQ MUTABLE_EFFICACE = null;
