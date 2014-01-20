@@ -956,12 +956,12 @@ final class QEfficace extends QAbstrait implements Efficace {
 
 	@Override
 	public Q creer(Z numerateur, Z denominateur) {
-		return new QEfficace(fabRat.creer(numerateur, denominateur, fabR, denominateur));
+		return new QEfficace(fabRat.creer(numerateur, denominateur, fabR, fabZ));
 	}
 
 	@Override
 	public Q creer(Reel rationnel) {
-		return new QEfficace(fabRat.creer(rationnel, rationnel, fabZ));
+		return new QEfficace(fabRat.creer(rationnel, fabR, fabZ));
 	}
 
 	@Override
@@ -1031,17 +1031,17 @@ final class QSymbolique extends QAbstrait implements Q{
 
 	@Override
 	public Q creer(Z numerateur, Z denominateur) {
-		return new QSymbolique(fabRat.creer(numerateur, denominateur, fabR, denominateur));
+		return new QSymbolique(fabRat.creer(numerateur, denominateur, fabR, fabZ));
 	}
 
 	@Override
 	public Q creer(Reel rationnel) {
-		return new QSymbolique(fabRat.creer(rationnel, rationnel, fabZ));
+		return new QSymbolique(fabRat.creer(rationnel, fabR, fabZ));
 	}
 
 	@Override
 	public Q somme(Q a) {
-		Reel somme =this.quotient().somme(quotient());
+		Reel somme =this.quotient().somme(a.quotient());
 
 		return this.creer(somme);
 	}
@@ -1089,8 +1089,8 @@ class QMutableEfficace extends QAbstrait implements Q, Efficace, Mutable{
 	}
 
 	private static FabriqueRationnel fabRat = FabriqueQuotient.getInstance();
-	private static FabriqueReel fabR = FabriquerReel.IMMUTABLE;
-	private static FabriqueZ fabZ = FabriquerZ.IMMUTABLE;
+	private static FabriqueReel fabR = FabriquerReel.MUTABLE;
+	private static FabriqueZ fabZ = FabriquerZ.MUTABLE;
 
 	public static void setFabriqueRationnel(FabriqueRationnel fabRat) {
 		QMutableEfficace.fabRat = fabRat;
@@ -1113,12 +1113,12 @@ class QMutableEfficace extends QAbstrait implements Q, Efficace, Mutable{
 
 	@Override
 	public Q creer(Z numerateur, Z denominateur) {
-		return new QMutableEfficace(fabRat.creer(numerateur, denominateur, fabR, denominateur));
+		return new QMutableEfficace(fabRat.creer(numerateur, denominateur, fabR, fabZ));
 	}
 
 	@Override
 	public Q creer(Reel rationnel) {
-		return new QMutableEfficace(fabRat.creer(rationnel, rationnel, fabZ));
+		return new QMutableEfficace(fabRat.creer(rationnel, fabR, fabZ));
 	}
 
 	@Override
@@ -1170,8 +1170,8 @@ class QMutableSymbolique extends QAbstrait implements Q, Mutable{
 	}
 
 	private static FabriqueRationnel fabRat = FabriqueFraction.getInstance();
-	private static FabriqueReel fabR = FabriquerReel.IMMUTABLE;
-	private static FabriqueZ fabZ = FabriquerZ.IMMUTABLE;
+	private static FabriqueReel fabR = FabriquerReel.MUTABLE;
+	private static FabriqueZ fabZ = FabriquerZ.MUTABLE;
 
 	public static void setFabriqueRationnel(FabriqueRationnel fabRat) {
 		QMutableSymbolique.fabRat = fabRat;
