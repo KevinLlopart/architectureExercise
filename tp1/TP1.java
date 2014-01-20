@@ -1,6 +1,8 @@
 package tp1;
 import java.util.*;
 
+import tp1.ApproximationDiophantienne.Fraction;
+
 class Messages {
 	public static final String SANS_PREDECESSEUR = 
 			"Cet entier naturel vaut zéro : il n'a pas de prédécesseur."; 
@@ -485,102 +487,574 @@ class FabriquerReel {
 
 }
 
+
+
+*/
+
+//RATIONNEL
+
 interface Rationnel {
 	Z numerateur(); // Renvoie le numérateur
+
 	Z denominateur(); // Renvoie le dénominateur
-	Reel quotient(); // Renvoie le quotient
+
+	Reel quotient(); // Renvoie le quotientAlgorithmesArithmetiques
 }
 
 interface FabriqueQ {
-	Q creer(Z numerateur, Z denominateur); // Crée le rationnel "numerateur"/"denominateur"
-	Q creer(Reel rationnel); // // Crée le rationnel de valeur réelle "rationnel"
+	Q creer(Z numerateur, Z denominateur); // Crée le rationnel
+											// "numerateur"/"denominateur"
+
+	Q creer(Reel rationnel); // // Crée le rationnel de valeur réelle
+								// "rationnel"
 }
 
 interface CorpsQ {
 	Q somme(Q a);
+
 	Q zero();
+
 	Q oppose();
+
 	Q produit(Q a);
+
 	Q un();
+
 	Q inverse();
 }
 
 interface Q extends Rationnel, FabriqueQ, CorpsQ {
 	boolean equals(Object o); // Renvoie false
-	//   si o n'est pas de type Q,
+	// si o n'est pas de type Q,
 	// teste l'égalité des rationnels sinon
-	String toString(); // Représente le rationnel sous la forme "numerateur/denominateur"
+
+	String toString(); // Représente le rationnel sous la forme
+						// "numerateur/denominateur"
 }
 
-
-// TODO - agrégation avec délégation - bas - classe RationnelParQuotient
+//- agrégation avec délégation - bas - classe RationnelParQuotient
 class RationnelParQuotient implements Rationnel, Efficace {
-	private FabriqueReel fabR; //  fabrique de réels
-	private FabriqueZ fabZ; // fabrique d'entiers relatifs
+	private FabriqueReel fabR; // fabrique de réels
+	private FabriqueZ fabZ;// fabrique d'entiers
+							// relatifsAlgorithmesArithmetiques
 
+	protected double quotient;
+
+	public RationnelParQuotient(FabriqueReel fabR, FabriqueZ fabZ,
+			double quotient) {
+		super();
+		this.fabR = fabR;
+		this.fabZ = fabZ;
+		this.quotient = quotient;
+	}
+	
+	
+
+
+
+
+	@Override
+	public Z numerateur() {
+		Fraction fraction = ApproximationDiophantienne.approximation(quotient);
+		return fabZ.creer(fraction.numerateur);
+	}
+
+	@Override
+	public Z denominateur() {
+		Fraction fraction = ApproximationDiophantienne.approximation(quotient);
+
+		return fabZ.creer(fraction.denominateur);
+	}
+
+	@Override
+	public Reel quotient() {
+		return fabR.creer(quotient);
+	}
 
 }
 
-// TODO - agrégation avec délégation - bas - classe RationnelParFraction
+//- agrégation avec délégation - bas - classe RationnelParFraction
 class RationnelParFraction implements Rationnel {
-	private FabriqueReel fabR; //  fabrique de réels
+	private FabriqueReel fabR; // fabrique de réels
 	private FabriqueZ fabZ; // fabrique d'entiers relatifs
+
+	protected Fraction fraction;
+	
+	
+
+
+	public RationnelParFraction(FabriqueReel fabR, FabriqueZ fabZ,
+			Fraction fraction) {
+		super();
+		this.fabR = fabR;
+		this.fabZ = fabZ;
+		this.fraction = fraction;
+	}
+
+	@Override
+	public Z numerateur() {
+		return fabZ.creer(fraction.numerateur);
+	}
+
+	@Override
+	public Z denominateur() {
+		return fabZ.creer(fraction.denominateur);
+	}
+
+	@Override
+	public Reel quotient() {
+		return fabR.creer(fraction.numerateur / fraction.denominateur);
+	}
 
 }
 
 interface FabriqueRationnel {
-	Rationnel creer(Z numerateur, Z denominateur, FabriqueReel fabR, FabriqueZ fabZ);
+	Rationnel creer(Z numerateur, Z denominateur, FabriqueReel fabR,
+			FabriqueZ fabZ);
+
 	Rationnel creer(Reel rationnel, FabriqueReel fabR, FabriqueZ fabZ);
 }
 
-// TODO - implémentation de fabriques par des classes singletons FabriqueFraction et  FabriqueQuotient
+//- implémentation de fabriques par des classes singletons
+//FabriqueFraction et FabriqueQuotient
 
+class FabriqueQuotient implements FabriqueRationnel, Efficace {
 
-// TODO (compléter) agrégation avec délégation - haut - classe abstraite QAbstrait (factorisation de la délégation)
-abstract class QAbstrait implements Q {
-	abstract public Q creer(Z numerateur, Z denominateur);
-	abstract public Q creer(Reel rationnel);
-	abstract public Q somme(Q a);
-	abstract public Q zero();
-	abstract public Q oppose();
-	abstract public Q produit(Q a);
-	abstract public Q un();
-	abstract public Q inverse();
+	private static FabriqueQuotient SINGLETON = null;
+
+	private FabriqueQuotient() {
+
+	}
+
+	public static FabriqueQuotient getInstance() {
+		if (SINGLETON == null) {
+			SINGLETON = new FabriqueQuotient();
+		} 
+		
+		return SINGLETON;
+	}
+
+	@Override
+	public Rationnel creer(Z numerateur, Z denominateur, FabriqueReel fabR,
+			FabriqueZ fabZ) {
+		return new RationnelParQuotient(fabR, fabZ, numerateur.val()
+				/ denominateur.val());
+	}
+
+	@Override
+	public Rationnel creer(Reel rationnel, FabriqueReel fabR, FabriqueZ fabZ) {
+		return new RationnelParQuotient(fabR, fabZ, rationnel.val());
+	}
+
 }
 
-// TODO - agrégation avec délégation - haut - immutable, efficace - classe QEfficace
+class FabriqueFraction implements FabriqueRationnel {
+	
+	protected FabriqueFraction(){
+		
+	}
+	
+	private static FabriqueFraction singleton = null;
+	
+	public static FabriqueFraction getInstance(){
+		if(singleton==null){
+			singleton = new FabriqueFraction();
+		}
+		return singleton;
+	}
+
+	@Override
+	public Rationnel creer(Z numerateur, Z denominateur, FabriqueReel fabR,
+			FabriqueZ fabZ) {
+		double quotient = numerateur.val() / denominateur.val();
+		return new RationnelParFraction(fabR, fabZ,
+				ApproximationDiophantienne.approximation(quotient));
+	}
+
+	@Override
+	public Rationnel creer(Reel rationnel, FabriqueReel fabR, FabriqueZ fabZ) {
+		return new RationnelParFraction(fabR, fabZ,
+				ApproximationDiophantienne.approximation(rationnel.val()));
+	}
+
+}
+
+//(compléter) agrégation avec délégation - haut - classe abstraite
+//QAbstrait (factorisation de la délégation)
+abstract class QAbstrait implements Q {
+
+	protected Rationnel rationnel;
+
+	protected QAbstrait(Rationnel rationnel) {
+		super();
+		this.rationnel = rationnel;
+	}
+
+	abstract public Q creer(Z numerateur, Z denominateur);
+
+	abstract public Q creer(Reel rationnel);
+
+	abstract public Q somme(Q a);
+
+	abstract public Q zero();
+
+	abstract public Q oppose();
+
+	abstract public Q produit(Q a);
+
+	abstract public Q un();
+
+	abstract public Q inverse();
+	
+	@Override
+	public Reel quotient(){
+		return rationnel.quotient();
+	}
+	
+	@Override
+	public Z numerateur(){
+		return rationnel.numerateur();
+	}
+	
+	@Override
+	public Z denominateur(){
+		return rationnel.denominateur();
+	}
+}
+
+//- agrégation avec délégation - haut - immutable, efficace - classe
+//QEfficace
 class QEfficace extends QAbstrait implements Q, Efficace {
 
-	private static FabriqueRationnel fabRat = FabriqueQuotient.SINGLETON;
+	protected QEfficace(Rationnel rationnel) {
+		super(rationnel);
+	}
+
+	private static FabriqueRationnel fabRat = FabriqueQuotient.getInstance();
 	private static FabriqueReel fabR = FabriquerReel.IMMUTABLE;
 	private static FabriqueZ fabZ = FabriquerZ.IMMUTABLE;
 
-	public static void setFabriqueRationnel(FabriqueRationnel fabRat){
+	public static void setFabriqueRationnel(FabriqueRationnel fabRat) {
 		QEfficace.fabRat = fabRat;
 	}
-	public static void setFabriqueReel(FabriqueReel fabR){
-		if(fabR instanceof Mutable){
+
+	public static void setFabriqueReel(FabriqueReel fabR) {
+		if (fabR instanceof Mutable) {
 			throw new IllegalArgumentException(fabR + Messages.FABREEL_MUTABLE);
 		}
 		QEfficace.fabR = fabR;
 	}
-	public static void setFabriqueZ(FabriqueZ fabZ){
-		if(fabZ instanceof Mutable){
+
+	public static void setFabriqueZ(FabriqueZ fabZ) {
+		if (fabZ instanceof Mutable) {
 			throw new IllegalArgumentException(fabZ + Messages.FABZ_MUTABLE);
 		}
 		QEfficace.fabZ = fabZ;
 	}
 
+	
+	@Override
+	public Q creer(Z numerateur, Z denominateur) {
+		return new QEfficace(fabRat.creer(numerateur, denominateur, fabR, denominateur));
+	}
+
+	@Override
+	public Q creer(Reel rationnel) {
+		return new QEfficace(fabRat.creer(rationnel, rationnel, fabZ));
+	}
+
+	@Override
+	public Q somme(Q a) {
+		double somme =this.quotient().val()+a.quotient().val();
+		return new QEfficace(fabRat.creer(fabR.creer(somme), fabR, fabZ));
+	}
+
+	@Override
+	public Q zero() {
+		return new QEfficace(fabRat.creer(fabR.creer(0), fabR, fabZ));
+	}
+
+	@Override
+	public Q oppose() {
+		return new QEfficace(fabRat.creer(fabR.creer(this.quotient().oppose().val()), fabR, fabZ));
+	}
+
+	@Override
+	public Q produit(Q a) {
+		Reel rationnel = a.quotient().produit(this.quotient());
+		return new QEfficace(fabRat.creer(rationnel, fabR, fabZ));
+	}
+
+	@Override
+	public Q un() {
+		return new QEfficace(fabRat.creer(fabR.creer(1), fabR, fabZ));
+
+	}
+
+	@Override
+	public Q inverse() {
+		double rationnel = this.rationnel.quotient().inverse().val();
+		return new QEfficace(fabRat.creer(fabR.creer(rationnel), fabR, fabZ));
+		
+	}
+
 }
 
-// TODO - agrégation avec délégation - haut - immutable, symbolique - classe QSymbolique
+
+class QSymbolique extends QAbstrait implements Q{
+
+	protected QSymbolique(Rationnel rationnel) {
+		super(rationnel);
+	}
+	
+	
+	
+	private static FabriqueRationnel fabRat = FabriqueFraction.getInstance();
+	private static FabriqueReel fabR = FabriquerReel.IMMUTABLE;
+	private static FabriqueZ fabZ = FabriquerZ.IMMUTABLE;
+
+	public static void setFabriqueRationnel(FabriqueRationnel fabRat) {
+		QSymbolique.fabRat = fabRat;
+	}
+
+	public static void setFabriqueReel(FabriqueReel fabR) {
+		if (fabR instanceof Mutable) {
+			throw new IllegalArgumentException(fabR + Messages.FABREEL_MUTABLE);
+		}
+		QSymbolique.fabR = fabR;
+	}
+
+	public static void setFabriqueZ(FabriqueZ fabZ) {
+		if (fabZ instanceof Mutable) {
+			throw new IllegalArgumentException(fabZ + Messages.FABZ_MUTABLE);
+		}
+		QSymbolique.fabZ = fabZ;
+	}
+
+	@Override
+	public Q creer(Z numerateur, Z denominateur) {
+		return new QSymbolique(fabRat.creer(numerateur, denominateur, fabR, denominateur));
+	}
+
+	@Override
+	public Q creer(Reel rationnel) {
+		return new QSymbolique(fabRat.creer(rationnel, rationnel, fabZ));
+	}
+
+	@Override
+	public Q somme(Q a) {
+		Reel somme =this.quotient().somme(quotient());
+
+		return this.creer(somme);
+	}
+
+	@Override
+	public Q zero() {
+		return this.creer(fabR.creer(0));
+	}
+
+	@Override
+	public Q oppose() {
+		Z numerateur = this.rationnel.numerateur().oppose();
+		Z denominateur = this.rationnel.denominateur();
+		return this.creer(numerateur, denominateur);
+	}
+
+	@Override
+	public Q produit(Q a) {
+		Z termeNum1 = this.rationnel.numerateur().produit(a.denominateur());
+		Z termeNum2 = this.rationnel.denominateur().produit(a.numerateur());
+		Z numerateur = termeNum1.somme(termeNum2);
+		Z denominateur = this.rationnel.denominateur().produit(a.denominateur());
+		
+		return this.creer(numerateur, denominateur);
+	}
+
+	@Override
+	public Q un() {
+		return this.creer(fabR.creer(1));
+	}
+
+	@Override
+	public Q inverse() {
+		return this.creer(this.rationnel.denominateur(),this.rationnel.numerateur());
+	}
+	
+}
 
 
-// TODO - agrégation avec délégation - haut - mutable, efficace - classe QMutableEfficace
+//TODO - agrégation avec délégation - haut - mutable, efficace - classe
+//QMutableEfficace
+class QMutableEfficace extends QAbstrait implements Q, Efficace, Mutable{
+
+	protected QMutableEfficace(Rationnel rationnel) {
+		super(rationnel);
+	}
+
+	private static FabriqueRationnel fabRat = FabriqueQuotient.getInstance();
+	private static FabriqueReel fabR = FabriquerReel.IMMUTABLE;
+	private static FabriqueZ fabZ = FabriquerZ.IMMUTABLE;
+
+	public static void setFabriqueRationnel(FabriqueRationnel fabRat) {
+		QMutableEfficace.fabRat = fabRat;
+	}
+
+	public static void setFabriqueReel(FabriqueReel fabR) {
+		if (fabR instanceof Mutable) {
+			throw new IllegalArgumentException(fabR + Messages.FABREEL_MUTABLE);
+		}
+		QMutableEfficace.fabR = fabR;
+	}
+
+	public static void setFabriqueZ(FabriqueZ fabZ) {
+		if (fabZ instanceof Mutable) {
+			throw new IllegalArgumentException(fabZ + Messages.FABZ_MUTABLE);
+		}
+		QMutableEfficace.fabZ = fabZ;
+	}
+
+	
+	@Override
+	public Q creer(Z numerateur, Z denominateur) {
+		return new QMutableEfficace(fabRat.creer(numerateur, denominateur, fabR, denominateur));
+	}
+
+	@Override
+	public Q creer(Reel rationnel) {
+		return new QMutableEfficace(fabRat.creer(rationnel, rationnel, fabZ));
+	}
+
+	@Override
+	public Q somme(Q a) {
+		Reel somme = this.rationnel.quotient().somme(a.quotient());
+		this.rationnel = fabRat.creer(somme, fabR, fabZ);
+		return this;
+	}
+
+	@Override
+	public Q zero() {
+		this.rationnel = fabRat.creer(fabR.creer(0), fabR, fabZ);
+		return this;
+	}
+
+	@Override
+	public Q oppose() {
+		Reel oppose = this.rationnel.quotient().oppose();
+		this.rationnel = fabRat.creer(oppose, fabR, fabZ);
+		return this;
+	}
+
+	@Override
+	public Q produit(Q a) {
+		Reel produit = this.rationnel.quotient().produit(a.quotient());
+		this.rationnel = fabRat.creer(produit, fabR, fabZ);
+		return this;
+	}
+
+	@Override
+	public Q un() {
+		this.rationnel=fabRat.creer(fabR.creer(1), fabR, fabZ);
+		return this;
+
+	}
+
+	@Override
+	public Q inverse() {
+		this.rationnel = fabRat.creer(this.rationnel.quotient().inverse(), fabR, fabZ);
+		return this;
+	}
+	
+}
 
 
-// TODO - agrégation avec délégation - haut - mutable, symbolique - classe QMutableSymbolique
 
+//- agrégation avec délégation - haut - mutable, symbolique - classe
+//QMutableSymbolique
+
+class QMutableSymbolique extends QAbstrait implements Q, Mutable{
+
+	protected QMutableSymbolique(Rationnel rationnel) {
+		super(rationnel);
+	}
+	
+	private static FabriqueRationnel fabRat = FabriqueFraction.getInstance();
+	private static FabriqueReel fabR = FabriquerReel.IMMUTABLE;
+	private static FabriqueZ fabZ = FabriquerZ.IMMUTABLE;
+
+	public static void setFabriqueRationnel(FabriqueRationnel fabRat) {
+		QMutableSymbolique.fabRat = fabRat;
+	}
+
+	public static void setFabriqueReel(FabriqueReel fabR) {
+		if (fabR instanceof Mutable) {
+			throw new IllegalArgumentException(fabR + Messages.FABREEL_MUTABLE);
+		}
+		QMutableSymbolique.fabR = fabR;
+	}
+
+	public static void setFabriqueZ(FabriqueZ fabZ) {
+		if (fabZ instanceof Mutable) {
+			throw new IllegalArgumentException(fabZ + Messages.FABZ_MUTABLE);
+		}
+		QMutableSymbolique.fabZ = fabZ;
+	}
+
+	@Override
+	public Q creer(Z numerateur, Z denominateur) {
+		return new QSymbolique(fabRat.creer(numerateur, denominateur, fabR, denominateur));
+	}
+
+	@Override
+	public Q creer(Reel rationnel) {
+		return new QSymbolique(fabRat.creer(rationnel, rationnel, fabZ));
+	}
+
+	@Override
+	public Q somme(Q a) {
+		Reel somme =this.quotient().somme(quotient());
+
+		return this.creer(somme);
+	}
+
+	@Override
+	public Q zero() {
+		this.rationnel = fabRat.creer(fabR.creer(0), fabR, fabZ);
+		return this;
+	}
+
+	@Override
+	public Q oppose() {
+		Z numerateur = this.rationnel.numerateur().oppose();
+		Z denominateur = this.rationnel.denominateur();
+		this.rationnel = fabRat.creer(numerateur, denominateur, fabR, fabZ);
+		return this;
+	}
+
+	@Override
+	public Q produit(Q a) {
+		Z termeNum1 = this.rationnel.numerateur().produit(a.denominateur());
+		Z termeNum2 = this.rationnel.denominateur().produit(a.numerateur());
+		Z numerateur = termeNum1.somme(termeNum2);
+		Z denominateur = this.rationnel.denominateur().produit(a.denominateur());
+		this.rationnel=fabRat.creer(numerateur, denominateur, fabR, fabZ);
+		return this;
+	}
+
+	@Override
+	public Q un() {
+		this.rationnel=fabRat.creer(fabR.creer(1), fabR, fabZ);
+		return this;
+	}
+
+	@Override
+	public Q inverse() {
+		Z numerateur = this.rationnel.numerateur();
+		Z denominateur = this.rationnel.denominateur();
+		this.rationnel = fabRat.creer(denominateur, numerateur, fabR, fabZ);
+		return this;
+	}
+	
+}
 
 // TODO (compléter) - Fabriques de rationnels
 class FabriquerQ {
@@ -609,4 +1083,4 @@ class FabriquerQ {
 		}
 	}
 }
-	*/
+	
