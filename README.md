@@ -7,4 +7,4 @@ architectureExercise
 
 - Renvoyer une erreur pour une division par 0
 
-- Faire toString et equals des rationnels
+- Faire toString et equals des rationnels et de tous les autres types en fait
