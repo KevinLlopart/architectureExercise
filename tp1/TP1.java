@@ -91,6 +91,18 @@ abstract class IntPositif implements NombreNaturel{
 	public final boolean estNul() {
 		return i==0;
 	}
+	@Override
+	public String toString() {
+		return val()+"";
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Nat){
+			return ((Nat)o).val()==val();
+		}
+		return false;
+	}
 }
 // bottom up - haut - immutable - classe NatParIntPositif
 //DONE!
@@ -145,7 +157,7 @@ interface Mutable {}
 // bottom up - haut - mutable - classe NatMutableParIntPositif
 //DONE!
 class NatMutableParIntPositif extends IntPositif implements Nat,Mutable{
-	
+
 	public NatMutableParIntPositif(int j) {
 		this.i=j;
 	}
@@ -187,7 +199,7 @@ class NatMutableParIntPositif extends IntPositif implements Nat,Mutable{
 			return creer(val()-1);
 		}
 	}
-	
+
 }
 //classe FabriquerNat
 //DONE!
@@ -251,190 +263,215 @@ interface Efficace {}
 //DONE!
 abstract class ZEfficace implements Z, Efficace{
 
-    @Override
-    public final Z somme(Z a) {
-        return this.creer(a.val() + this.val());
-    }
+	@Override
+	public final Z somme(Z a) {
+		return this.creer(a.val() + this.val());
+	}
 
-    @Override
-    public final Z zero() {
-        return this.creer(0);
-    }
+	@Override
+	public final Z zero() {
+		return this.creer(0);
+	}
 
-    @Override
-    public final Z oppose() {
-        return this.creer(-this.val());
-    }
+	@Override
+	public final Z oppose() {
+		return this.creer(-this.val());
+	}
 
-    @Override
-    public final Z produit(Z a) {
-        return this.creer(this.val()*a.val());
-    }
+	@Override
+	public final Z produit(Z a) {
+		return this.creer(this.val()*a.val());
+	}
 
-    @Override
-    public final Z un() {
-        return this.creer(1);
-    }
+	@Override
+	public final Z un() {
+		return this.creer(1);
+	}
+
+	@Override
+	public String toString() {
+		return val()+"";
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Z){
+			return ((Z)o).val()==val();
+		}
+		return false;
+	}
 }
 
 //top down - bas - immutable - classe ZEfficaceParInt
 //DONE!
-final class ZEfficaceParInt extends ZEfficace implements Z{
+final class ZEfficaceParInt extends ZEfficace{
 
-    protected int val;
+	protected int val;
 
-    public ZEfficaceParInt(int val) {
-        this.val = val;
-    }
+	public ZEfficaceParInt(int val) {
+		this.val = val;
+	}
 
-    // Dépendance relative à une fabrique d'entiers naturels
-    private static FabriqueNat fabNat = FabriquerNat.IMMUTABLE;
+	// Dépendance relative à une fabrique d'entiers naturels
+	private static FabriqueNat fabNat = FabriquerNat.IMMUTABLE;
 
-    public static void setFabriqueNat(FabriqueNat fabNat){
-        if(fabNat instanceof Mutable){
-            throw new IllegalArgumentException(fabNat + Messages.FABNAT_MUTABLE);
-        }
-        ZEfficaceParInt.fabNat = fabNat;
-    }
+	public static void setFabriqueNat(FabriqueNat fabNat){
+		if(fabNat instanceof Mutable){
+			throw new IllegalArgumentException(fabNat + Messages.FABNAT_MUTABLE);
+		}
+		ZEfficaceParInt.fabNat = fabNat;
+	}
 
-    @Override
-    public Z creer(boolean signe, Nat abs) {
-        return signe ? new ZEfficaceParInt(abs.val()) : new ZEfficaceParInt((-abs.val()));
-    }
+	@Override
+	public Z creer(boolean signe, Nat abs) {
+		return signe ? new ZEfficaceParInt(abs.val()) : new ZEfficaceParInt((-abs.val()));
+	}
 
-    @Override
-    public Z creer(Nat diminuende, Nat diminuteur) {
-        return new ZEfficaceParInt(diminuende.val() - diminuteur.val());
-    }
+	@Override
+	public Z creer(Nat diminuende, Nat diminuteur) {
+		return new ZEfficaceParInt(diminuende.val() - diminuteur.val());
+	}
 
-    @Override
-    public Z creer(int val) {
-        return new ZEfficaceParInt(val);
-    }
+	@Override
+	public Z creer(int val) {
+		return new ZEfficaceParInt(val);
+	}
 
-    @Override
-    public int val() {
-        return val;
-    }
+	@Override
+	public int val() {
+		return val;
+	}
 
-    @Override
-    public boolean estPositif() {
-        return val >= 0;
-    }
+	@Override
+	public boolean estPositif() {
+		return val >= 0;
+	}
 
-    @Override
-    public boolean estNegatif() {
-        return val <= 0;
-    }
+	@Override
+	public boolean estNegatif() {
+		return val <= 0;
+	}
 
-    @Override
-    public Nat valAbsolue() {
-        return val >= 0 ? fabNat.creer(val) : fabNat.creer(-val);
-    }
+	@Override
+	public Nat valAbsolue() {
+		return val >= 0 ? fabNat.creer(val) : fabNat.creer(-val);
+	}
 
-    @Override
-    public Nat diminuende() {
-        return val>=0 ? fabNat.creer(val) : fabNat.creer(0);
-    }
+	@Override
+	public Nat diminuende() {
+		return val>=0 ? fabNat.creer(val) : fabNat.creer(0);
+	}
 
-    @Override
-    public Nat diminuteur() {
-    	return val>=0 ? fabNat.creer(0) : fabNat.creer(-val);
-    }
+	@Override
+	public Nat diminuteur() {
+		return val>=0 ? fabNat.creer(0) : fabNat.creer(-val);
+	}
 }
 
 // top down - haut - mutable - classe ZEfficaceMutable
 //DONE!
 abstract class ZEfficaceMutable implements Z, Efficace,Mutable{
 
-  @Override
-  public Z zero() {
-      return this.creer(0);
-  }
+	@Override
+	public Z zero() {
+		return this.creer(0);
+	}
 
-  @Override
-  public Z oppose() {
-      return this.creer(-this.val());
-  }
-  protected int val;
-  @Override
-  public Z un() {
-      return this.creer(1);
-  }
+	@Override
+	public Z oppose() {
+		return this.creer(-this.val());
+	}
+	protected int val;
+	@Override
+	public Z un() {
+		return this.creer(1);
+	}
+	@Override
+	public String toString() {
+		return val()+"";
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Z){
+			return ((Z)o).val()==val();
+		}
+		return false;
+	}
 }
 // top down - bas - mutable - class ZEfficaceMutableParInt
 //DONE!
 class ZEfficaceMutableParInt extends ZEfficaceMutable implements Z{
 
-    protected int val;
-    // Dépendance relative à une fabrique d'entiers naturels
-    private static FabriqueNat fabNat = FabriquerNat.MUTABLE;
+	protected int val;
+	// Dépendance relative à une fabrique d'entiers naturels
+	private static FabriqueNat fabNat = FabriquerNat.MUTABLE;
 
-    public ZEfficaceMutableParInt(int val) {
-        this.val = val;
-    }
-    @Override
-    public Z somme(Z a) {
-  	  this.val+=a.val();
-        return this;
-    }
-    @Override
-    public Z produit(Z a) {
-  	  this.val*=a.val();
-        return this;
-    }
+	public ZEfficaceMutableParInt(int val) {
+		this.val = val;
+	}
+	@Override
+	public Z somme(Z a) {
+		this.val+=a.val();
+		return this;
+	}
+	@Override
+	public Z produit(Z a) {
+		this.val*=a.val();
+		return this;
+	}
 
-    public static void setFabriqueNat(FabriqueNat fabNat){
-        if(! (fabNat instanceof Mutable)){
-            throw new IllegalArgumentException(fabNat + Messages.FABNAT_IMMUTABLE);
-        }
-        ZEfficaceMutableParInt.fabNat = fabNat;
-    }
+	public static void setFabriqueNat(FabriqueNat fabNat){
+		if(! (fabNat instanceof Mutable)){
+			throw new IllegalArgumentException(fabNat + Messages.FABNAT_IMMUTABLE);
+		}
+		ZEfficaceMutableParInt.fabNat = fabNat;
+	}
 
-    @Override
-    public Z creer(boolean signe, Nat abs) {
-        return signe ? new ZEfficaceMutableParInt(abs.val()) : new ZEfficaceMutableParInt((-abs.val()));
-    }
+	@Override
+	public Z creer(boolean signe, Nat abs) {
+		return signe ? new ZEfficaceMutableParInt(abs.val()) : new ZEfficaceMutableParInt((-abs.val()));
+	}
 
-    @Override
-    public Z creer(Nat diminuende, Nat diminuteur) {
-        return new ZEfficaceMutableParInt(diminuende.val() - diminuteur.val());
-    }
+	@Override
+	public Z creer(Nat diminuende, Nat diminuteur) {
+		return new ZEfficaceMutableParInt(diminuende.val() - diminuteur.val());
+	}
 
-    @Override
-    public Z creer(int val) {
-        return new ZEfficaceMutableParInt(val);
-    }
+	@Override
+	public Z creer(int val) {
+		return new ZEfficaceMutableParInt(val);
+	}
 
-    @Override
-    public int val() {
-        return val;
-    }
+	@Override
+	public int val() {
+		return val;
+	}
 
-    @Override
-    public boolean estPositif() {
-        return val >= 0;
-    }
+	@Override
+	public boolean estPositif() {
+		return val >= 0;
+	}
 
-    @Override
-    public boolean estNegatif() {
-        return val <= 0;
-    }
+	@Override
+	public boolean estNegatif() {
+		return val <= 0;
+	}
 
-    @Override
-    public Nat valAbsolue() {
-        return val >= 0 ? fabNat.creer(val) : fabNat.creer(-val);
-    }
+	@Override
+	public Nat valAbsolue() {
+		return val >= 0 ? fabNat.creer(val) : fabNat.creer(-val);
+	}
 
-    @Override
-    public Nat diminuende() {
-        return val>=0 ? fabNat.creer(val) : fabNat.creer(0);
-    }
+	@Override
+	public Nat diminuende() {
+		return val>=0 ? fabNat.creer(val) : fabNat.creer(0);
+	}
 
-    @Override
-    public Nat diminuteur() {
-    	return val>=0 ? fabNat.creer(0) : fabNat.creer(-val);
-    }
+	@Override
+	public Nat diminuteur() {
+		return val>=0 ? fabNat.creer(0) : fabNat.creer(-val);
+	}
 }
 
 // classe FabriquerZ
@@ -485,9 +522,9 @@ interface Reel extends FabriqueReel, CorpsReel {
 }
 
 //Agrégation simple - immutable - classe ReelParDouble
-class ReelParDouble implements Reel {
+final class ReelParDouble implements Reel {
 	private static double PRECISION = 1e-12; // Précision relative lors des
-												// tests d'égalité. }
+	// tests d'égalité. }
 	private double leDouble;
 
 	public ReelParDouble(double leDouble) {
@@ -572,8 +609,7 @@ class ReelParDoubleMutable implements Reel, Mutable {
 
 	@Override
 	public Reel zero() {
-		this.leDouble = 0;
-		return this;
+		return this.creer(0);
 	}
 
 	@Override
@@ -590,14 +626,12 @@ class ReelParDoubleMutable implements Reel, Mutable {
 
 	@Override
 	public Reel un() {
-		this.leDouble = 1;
-		return this;
+		return this.creer(1);
 	}
 
 	@Override
 	public Reel inverse() {
-		this.leDouble = 1 / leDouble;
-		return this;
+		return this.creer(1 / val());
 	}
 
 	@Override
@@ -653,10 +687,10 @@ interface Rationnel {
 
 interface FabriqueQ {
 	Q creer(Z numerateur, Z denominateur); // Crée le rationnel
-											// "numerateur"/"denominateur"
+	// "numerateur"/"denominateur"
 
 	Q creer(Reel rationnel); // // Crée le rationnel de valeur réelle
-								// "rationnel"
+	// "rationnel"
 }
 
 interface CorpsQ {
@@ -679,14 +713,14 @@ interface Q extends Rationnel, FabriqueQ, CorpsQ {
 	// teste l'égalité des rationnels sinon
 
 	String toString(); // Représente le rationnel sous la forme
-						// "numerateur/denominateur"
+	// "numerateur/denominateur"
 }
 
 //- agrégation avec délégation - bas - classe RationnelParQuotient
-class RationnelParQuotient implements Rationnel, Efficace {
+final class RationnelParQuotient implements Rationnel, Efficace {
 	private FabriqueReel fabR; // fabrique de réels
 	private FabriqueZ fabZ;// fabrique d'entiers
-							// relatifsAlgorithmesArithmetiques
+	// relatifsAlgorithmesArithmetiques
 
 	protected double quotient;
 
@@ -697,8 +731,8 @@ class RationnelParQuotient implements Rationnel, Efficace {
 		this.fabZ = fabZ;
 		this.quotient = quotient;
 	}
-	
-	
+
+
 
 
 
@@ -724,13 +758,13 @@ class RationnelParQuotient implements Rationnel, Efficace {
 }
 
 //- agrégation avec délégation - bas - classe RationnelParFraction
-class RationnelParFraction implements Rationnel {
+final class RationnelParFraction implements Rationnel {
 	private FabriqueReel fabR; // fabrique de réels
 	private FabriqueZ fabZ; // fabrique d'entiers relatifs
 
-	protected Fraction fraction;
-	
-	
+	private Fraction fraction;
+
+
 
 
 	public RationnelParFraction(FabriqueReel fabR, FabriqueZ fabZ,
@@ -753,7 +787,7 @@ class RationnelParFraction implements Rationnel {
 
 	@Override
 	public Reel quotient() {
-		return fabR.creer(fraction.numerateur / fraction.denominateur);
+		return fabR.creer((double) fraction.numerateur / fraction.denominateur);
 	}
 
 }
@@ -780,14 +814,14 @@ class FabriqueQuotient implements FabriqueRationnel, Efficace {
 		if (SINGLETON == null) {
 			SINGLETON = new FabriqueQuotient();
 		} 
-		
+
 		return SINGLETON;
 	}
 
 	@Override
 	public Rationnel creer(Z numerateur, Z denominateur, FabriqueReel fabR,
 			FabriqueZ fabZ) {
-		return new RationnelParQuotient(fabR, fabZ, numerateur.val()
+		return new RationnelParQuotient(fabR, fabZ, (double) numerateur.val()
 				/ denominateur.val());
 	}
 
@@ -799,13 +833,13 @@ class FabriqueQuotient implements FabriqueRationnel, Efficace {
 }
 
 class FabriqueFraction implements FabriqueRationnel {
-	
+
 	protected FabriqueFraction(){
-		
+
 	}
-	
+
 	private static FabriqueFraction singleton = null;
-	
+
 	public static FabriqueFraction getInstance(){
 		if(singleton==null){
 			singleton = new FabriqueFraction();
@@ -816,7 +850,7 @@ class FabriqueFraction implements FabriqueRationnel {
 	@Override
 	public Rationnel creer(Z numerateur, Z denominateur, FabriqueReel fabR,
 			FabriqueZ fabZ) {
-		double quotient = numerateur.val() / denominateur.val();
+		double quotient = (double) numerateur.val() / denominateur.val();
 		return new RationnelParFraction(fabR, fabZ,
 				ApproximationDiophantienne.approximation(quotient));
 	}
@@ -855,29 +889,46 @@ abstract class QAbstrait implements Q {
 	abstract public Q un();
 
 	abstract public Q inverse();
-	
+
 	@Override
 	public Reel quotient(){
 		return rationnel.quotient();
 	}
-	
+
 	@Override
 	public Z numerateur(){
 		return rationnel.numerateur();
 	}
-	
+
 	@Override
 	public Z denominateur(){
 		return rationnel.denominateur();
+	}
+	@Override
+	public String toString() {
+		String r="";
+		r=(denominateur().val()==1) ? numerateur().toString() : numerateur()+" / "+denominateur();
+		return r;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof QAbstrait){
+			return ((QAbstrait)o).quotient().equals(this.quotient());
+		}
+		if(o instanceof Reel){
+			return ((Reel)o).equals(this.quotient());
+		}
+		return o.equals(this);
 	}
 }
 
 //- agrégation avec délégation - haut - immutable, efficace - classe
 //QEfficace
-class QEfficace extends QAbstrait implements Q, Efficace {
+final class QEfficace extends QAbstrait implements Efficace {
 
-	protected QEfficace(Rationnel rationnel) {
-		super(rationnel);
+	public QEfficace(Rationnel r) {
+		super(r);
 	}
 
 	private static FabriqueRationnel fabRat = FabriqueQuotient.getInstance();
@@ -902,7 +953,7 @@ class QEfficace extends QAbstrait implements Q, Efficace {
 		QEfficace.fabZ = fabZ;
 	}
 
-	
+
 	@Override
 	public Q creer(Z numerateur, Z denominateur) {
 		return new QEfficace(fabRat.creer(numerateur, denominateur, fabR, denominateur));
@@ -945,20 +996,17 @@ class QEfficace extends QAbstrait implements Q, Efficace {
 	public Q inverse() {
 		double rationnel = this.rationnel.quotient().inverse().val();
 		return new QEfficace(fabRat.creer(fabR.creer(rationnel), fabR, fabZ));
-		
-	}
 
+	}
 }
 
 
-class QSymbolique extends QAbstrait implements Q{
+final class QSymbolique extends QAbstrait implements Q{
 
-	protected QSymbolique(Rationnel rationnel) {
+	public  QSymbolique(Rationnel rationnel) {
 		super(rationnel);
 	}
-	
-	
-	
+
 	private static FabriqueRationnel fabRat = FabriqueFraction.getInstance();
 	private static FabriqueReel fabR = FabriquerReel.IMMUTABLE;
 	private static FabriqueZ fabZ = FabriquerZ.IMMUTABLE;
@@ -1016,7 +1064,7 @@ class QSymbolique extends QAbstrait implements Q{
 		Z termeNum2 = this.rationnel.denominateur().produit(a.numerateur());
 		Z numerateur = termeNum1.somme(termeNum2);
 		Z denominateur = this.rationnel.denominateur().produit(a.denominateur());
-		
+
 		return this.creer(numerateur, denominateur);
 	}
 
@@ -1029,16 +1077,15 @@ class QSymbolique extends QAbstrait implements Q{
 	public Q inverse() {
 		return this.creer(this.rationnel.denominateur(),this.rationnel.numerateur());
 	}
-	
 }
 
 
-//TODO - agrégation avec délégation - haut - mutable, efficace - classe
+//agrégation avec délégation - haut - mutable, efficace - classe
 //QMutableEfficace
 class QMutableEfficace extends QAbstrait implements Q, Efficace, Mutable{
 
-	protected QMutableEfficace(Rationnel rationnel) {
-		super(rationnel);
+	public QMutableEfficace(Rationnel r){
+		super(r);
 	}
 
 	private static FabriqueRationnel fabRat = FabriqueQuotient.getInstance();
@@ -1050,20 +1097,20 @@ class QMutableEfficace extends QAbstrait implements Q, Efficace, Mutable{
 	}
 
 	public static void setFabriqueReel(FabriqueReel fabR) {
-		if (fabR instanceof Mutable) {
-			throw new IllegalArgumentException(fabR + Messages.FABREEL_MUTABLE);
+		if (! (fabR instanceof Mutable)) {
+			throw new IllegalArgumentException(fabR + Messages.FABREEL_IMMUTABLE);
 		}
 		QMutableEfficace.fabR = fabR;
 	}
 
 	public static void setFabriqueZ(FabriqueZ fabZ) {
-		if (fabZ instanceof Mutable) {
-			throw new IllegalArgumentException(fabZ + Messages.FABZ_MUTABLE);
+		if (!(fabZ instanceof Mutable)) {
+			throw new IllegalArgumentException(fabZ + Messages.FABZ_IMMUTABLE);
 		}
 		QMutableEfficace.fabZ = fabZ;
 	}
 
-	
+
 	@Override
 	public Q creer(Z numerateur, Z denominateur) {
 		return new QMutableEfficace(fabRat.creer(numerateur, denominateur, fabR, denominateur));
@@ -1080,18 +1127,27 @@ class QMutableEfficace extends QAbstrait implements Q, Efficace, Mutable{
 		this.rationnel = fabRat.creer(somme, fabR, fabZ);
 		return this;
 	}
-
 	@Override
 	public Q zero() {
-		this.rationnel = fabRat.creer(fabR.creer(0), fabR, fabZ);
-		return this;
+		return new QMutableEfficace(fabRat.creer(fabR.creer(0), fabR, fabZ));
 	}
 
 	@Override
 	public Q oppose() {
-		Reel oppose = this.rationnel.quotient().oppose();
-		this.rationnel = fabRat.creer(oppose, fabR, fabZ);
-		return this;
+		return new QMutableEfficace(fabRat.creer(fabR.creer(this.quotient().oppose().val()), fabR, fabZ));
+	}
+
+	@Override
+	public Q un() {
+		return new QMutableEfficace(fabRat.creer(fabR.creer(1), fabR, fabZ));
+
+	}
+
+	@Override
+	public Q inverse() {
+		double rationnel = this.rationnel.quotient().inverse().val();
+		return new QMutableEfficace(fabRat.creer(fabR.creer(rationnel), fabR, fabZ));
+
 	}
 
 	@Override
@@ -1100,20 +1156,6 @@ class QMutableEfficace extends QAbstrait implements Q, Efficace, Mutable{
 		this.rationnel = fabRat.creer(produit, fabR, fabZ);
 		return this;
 	}
-
-	@Override
-	public Q un() {
-		this.rationnel=fabRat.creer(fabR.creer(1), fabR, fabZ);
-		return this;
-
-	}
-
-	@Override
-	public Q inverse() {
-		this.rationnel = fabRat.creer(this.rationnel.quotient().inverse(), fabR, fabZ);
-		return this;
-	}
-	
 }
 
 
@@ -1123,10 +1165,10 @@ class QMutableEfficace extends QAbstrait implements Q, Efficace, Mutable{
 
 class QMutableSymbolique extends QAbstrait implements Q, Mutable{
 
-	protected QMutableSymbolique(Rationnel rationnel) {
+	public QMutableSymbolique(Rationnel rationnel) {
 		super(rationnel);
 	}
-	
+
 	private static FabriqueRationnel fabRat = FabriqueFraction.getInstance();
 	private static FabriqueReel fabR = FabriquerReel.IMMUTABLE;
 	private static FabriqueZ fabZ = FabriquerZ.IMMUTABLE;
@@ -1136,48 +1178,56 @@ class QMutableSymbolique extends QAbstrait implements Q, Mutable{
 	}
 
 	public static void setFabriqueReel(FabriqueReel fabR) {
-		if (fabR instanceof Mutable) {
-			throw new IllegalArgumentException(fabR + Messages.FABREEL_MUTABLE);
+		if (! (fabR instanceof Mutable)) {
+			throw new IllegalArgumentException(fabR + Messages.FABREEL_IMMUTABLE);
 		}
 		QMutableSymbolique.fabR = fabR;
 	}
 
 	public static void setFabriqueZ(FabriqueZ fabZ) {
-		if (fabZ instanceof Mutable) {
-			throw new IllegalArgumentException(fabZ + Messages.FABZ_MUTABLE);
+		if (!(fabZ instanceof Mutable)) {
+			throw new IllegalArgumentException(fabZ + Messages.FABZ_IMMUTABLE);
 		}
 		QMutableSymbolique.fabZ = fabZ;
 	}
 
 	@Override
 	public Q creer(Z numerateur, Z denominateur) {
-		return new QSymbolique(fabRat.creer(numerateur, denominateur, fabR, denominateur));
+		return new QMutableSymbolique(fabRat.creer(numerateur, denominateur, fabR, denominateur));
 	}
 
 	@Override
 	public Q creer(Reel rationnel) {
-		return new QSymbolique(fabRat.creer(rationnel, rationnel, fabZ));
+		return new QMutableSymbolique(fabRat.creer(rationnel, rationnel, fabZ));
 	}
 
 	@Override
 	public Q somme(Q a) {
-		Reel somme =this.quotient().somme(quotient());
-
-		return this.creer(somme);
+		Reel somme = this.rationnel.quotient().somme(a.quotient());
+		this.rationnel = fabRat.creer(somme, fabR, fabZ);
+		return this;
 	}
 
 	@Override
 	public Q zero() {
-		this.rationnel = fabRat.creer(fabR.creer(0), fabR, fabZ);
-		return this;
+		return this.creer(fabR.creer(0));
 	}
 
 	@Override
 	public Q oppose() {
 		Z numerateur = this.rationnel.numerateur().oppose();
 		Z denominateur = this.rationnel.denominateur();
-		this.rationnel = fabRat.creer(numerateur, denominateur, fabR, fabZ);
-		return this;
+		return this.creer(numerateur, denominateur);
+	}
+
+	@Override
+	public Q un() {
+		return this.creer(fabR.creer(1));
+	}
+
+	@Override
+	public Q inverse() {
+		return this.creer(this.rationnel.denominateur(),this.rationnel.numerateur());
 	}
 
 	@Override
@@ -1189,29 +1239,14 @@ class QMutableSymbolique extends QAbstrait implements Q, Mutable{
 		this.rationnel=fabRat.creer(numerateur, denominateur, fabR, fabZ);
 		return this;
 	}
-
-	@Override
-	public Q un() {
-		this.rationnel=fabRat.creer(fabR.creer(1), fabR, fabZ);
-		return this;
-	}
-
-	@Override
-	public Q inverse() {
-		Z numerateur = this.rationnel.numerateur();
-		Z denominateur = this.rationnel.denominateur();
-		this.rationnel = fabRat.creer(denominateur, numerateur, fabR, fabZ);
-		return this;
-	}
-	
 }
 
-// TODO (compléter) - Fabriques de rationnels
+// Fabriques de rationnels
 class FabriquerQ {
-	public static final FabriqueQ SYMBOLIQUE = null;
-			public static final FabriqueQ EFFICACE = null;
-	public static final FabriqueQ MUTABLE_SYMBOLIQUE = null;
-	public static final FabriqueQ MUTABLE_EFFICACE = null;
+	public static final FabriqueQ SYMBOLIQUE = new QSymbolique(new RationnelParFraction(new ReelParDouble(0), new ZEfficaceParInt(0), ApproximationDiophantienne.approximation(0)));
+	public static final FabriqueQ EFFICACE = new QEfficace(new RationnelParQuotient(new ReelParDouble(0), new ZEfficaceParInt(0), 0));
+	public static final FabriqueQ MUTABLE_SYMBOLIQUE = new QMutableSymbolique(new RationnelParFraction(new ReelParDouble(0), new ZEfficaceParInt(0), ApproximationDiophantienne.approximation(0)));
+	public static final FabriqueQ MUTABLE_EFFICACE = new QMutableEfficace(new RationnelParQuotient(new ReelParDouble(0), new ZEfficaceParInt(0), 0));
 	public static Q mutable(Q x){
 		if(!(x instanceof Mutable)){
 			return (x instanceof Efficace) ? 
@@ -1233,4 +1268,4 @@ class FabriquerQ {
 		}
 	}
 }
-	
+
